@@ -1,0 +1,1729 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>게임 시스템 프로토타입</title>
+<style>
+* { box-sizing: border-box; }
+html, body { margin:0; width:100%; height:100%; }
+body {
+    font-family: Arial, "Malgun Gothic", sans-serif;
+    background:#202124;
+    color:#fff;
+    overflow:hidden;
+}
+.app-header {
+    height:58px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:0 14px;
+    background:#17181a;
+    border-bottom:1px solid #3b3d40;
+}
+.app-title {
+    font-weight:700;
+    margin-right:12px;
+    white-space:nowrap;
+}
+.tab {
+    height:38px;
+    padding:0 18px;
+    border:1px solid #45474b;
+    border-radius:7px;
+    background:#2a2c2f;
+    color:#bbb;
+    font-weight:700;
+    cursor:pointer;
+}
+.tab:hover { background:#33363a; color:#fff; }
+.tab.active {
+    background:#fff;
+    color:#17181a;
+    border-color:#fff;
+}
+.workspace {
+    height:calc(100vh - 58px);
+    width:100%;
+    position:relative;
+}
+.panel {
+    position:absolute;
+    inset:0;
+    display:none;
+    width:100%;
+    height:100%;
+    border:0;
+    background:#fff;
+}
+.panel.active { display:block; }
+</style>
+</head>
+<body>
+<header class="app-header">
+  <div class="app-title">게임 시스템 프로토타입</div>
+  <button class="tab active" data-target="uiPanel">인게임 UI 목업</button>
+  <button class="tab" data-target="simPanel">인챈트 시스템 시뮬레이터</button>
+</header>
+<main class="workspace">
+  <iframe id="uiPanel" class="panel active" title="인게임 UI 목업" srcdoc="&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;ko&quot;&gt;
+&lt;head&gt;
+    &lt;meta charset=&quot;UTF-8&quot;&gt;
+    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
+    &lt;title&gt;Game UI Mockup&lt;/title&gt;
+    &lt;style&gt;
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: &#x27;Noto Sans KR&#x27;, sans-serif;
+}
+
+body {
+    background-color: #f0f0f0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+button {
+    cursor: pointer;
+    border: none;
+    background: none;
+}
+
+/* ================== Test Panel ================== */
+.test-panel {
+    position: absolute;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #ffffff;
+    border: 2px solid #000;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.test-panel button {
+    background: #eeeeee;
+    padding: 10px;
+    border: 1px solid #000;
+    font-weight: bold;
+}
+.test-panel button:hover { background: #dddddd; }
+
+/* ================== Game Container ================== */
+.game-container {
+    position: relative;
+    width: 400px;
+    height: 866px; 
+    background: #ffffff;
+    border: 4px solid #333;
+    border-radius: 40px;
+    overflow: hidden;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+}
+
+.screen {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    display: flex;
+    flex-direction: column;
+    background: #ffffff;
+}
+
+/* ================== Base Screen ================== */
+.combat-area {
+    height: 480px;
+    position: relative;
+    background: #ffffff;
+}
+
+.punch-hole-margin {
+    position: absolute;
+    top: 30px; left: 20px; right: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.chapter-info {
+    display: flex;
+    margin: 0 auto;
+}
+.chapter-pill {
+    background: #888888;
+    color: #fff;
+    padding: 6px 12px;
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
+    font-size: 12px;
+}
+.stage-pill {
+    background: #cccccc;
+    color: #fff;
+    padding: 6px 12px;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+    font-size: 12px;
+}
+.pause-btn {
+    width: 36px; height: 36px;
+    background: #f0e6d2;
+    border-radius: 6px;
+    color: #a08060;
+    font-weight: bold;
+    font-size: 16px;
+    position: absolute;
+    right: 0;
+}
+
+.combat-scene {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-bottom: 20px;
+}
+
+.player-wrapper {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+.player-asset {
+    width: 70px; height: 100px;
+    background: #f0f0f0;
+    border: 1px solid #333;
+    position: absolute;
+    bottom: -20px;
+    z-index: 5;
+}
+.barrier {
+    width: 360px; height: 40px;
+    background: linear-gradient(to bottom, #9bc4e2, #aed4ec);
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+/* HP Bar Full Width */
+.hp-bar-full {
+    height: 20px;
+    background: #ff0000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.hp-text {
+    color: #fff;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+/* Sort Area */
+.sort-area {
+    flex: 1;
+    background: #a0a0a0;
+    display: flex;
+    flex-direction: column;
+    padding-top: 10px;
+}
+.sort-top-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 10px;
+    margin-bottom: 10px;
+}
+.combo-slots {
+    display: flex;
+    gap: 10px;
+}
+.combo-slot {
+    width: 60px; height: 40px;
+    background: #f0f0f0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 2px;
+}
+.c-unit { width: 10px; height: 30px; }
+.blue { background: #0078d7; }
+.yellow { background: #ffea00; }
+.red { background: #ff0000; }
+.green { background: #88cc44; }
+.lightblue { background: #d0f0ff; }
+
+.joker-slot {
+    width: 40px; height: 40px;
+    background: #f0e6d2;
+    border-radius: 8px;
+}
+
+.grid-section {
+    display: flex;
+    flex: 1;
+    background: #d0d0d0;
+}
+.wait-column {
+    width: 80px;
+    border-right: 2px solid #fff;
+    display: flex;
+    flex-direction: column;
+}
+.puzzle-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+}
+.grid-cell {
+    border-right: 1px solid #fff;
+    border-bottom: 1px solid #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.unit-group {
+    display: flex;
+    gap: 2px;
+}
+.s-unit {
+    width: 14px; height: 24px;
+    border-radius: 4px;
+}
+
+.exp-section {
+    height: 30px;
+    background: #888888;
+    display: flex;
+    align-items: center;
+    padding: 0 15px;
+    gap: 10px;
+}
+.level-text { font-size: 12px; color: #000; }
+.exp-gauge-bg {
+    flex: 1;
+    height: 6px;
+    background: #555;
+}
+.exp-gauge-fill {
+    height: 100%;
+    background: #88cc44;
+}
+.exp-value { font-size: 12px; color: #000; }
+
+/* ================== Popups Layer ================== */
+.popup-overlay {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.7);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 50;
+}
+.popup-overlay.active { display: flex; }
+.popup-overlay.z-high { z-index: 100; }
+
+.popup-box {
+    width: 340px;
+    background: #e0e0e0;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+.popup-title {
+    font-size: 20px;
+    font-weight: 900;
+    text-align: center;
+    margin: 20px 0;
+    color: #000;
+}
+.close-btn-x {
+    position: absolute;
+    top: 15px; right: 15px;
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+}
+
+/* Tabs */
+.popup-tabs {
+    display: flex;
+    padding: 0 20px;
+}
+.tab-btn {
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: bold;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+.tab-btn.active {
+    background: #555;
+    color: #fff;
+}
+.tab-btn.inactive {
+    background: #aaa;
+    color: #fff;
+    margin-left: 5px;
+}
+
+/* Popup Content Area */
+.popup-content-box {
+    background: #e0e0e0;
+    padding: 20px;
+}
+.popup-content-box.no-pad {
+    padding: 0 20px 20px 20px;
+}
+
+/* Enchants list (5 slots) */
+.enchant-list-container {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+.enchant-slot-square {
+    width: 50px; height: 50px;
+    background: #f0f0f0;
+    position: relative;
+    border: 1px solid #ccc;
+}
+.enchant-slot-square.active {
+    border: 2px solid #0055ff;
+}
+.enchant-slot-square.empty {
+    background: #555;
+    border: none;
+}
+.enchant-lv-text {
+    position: absolute;
+    bottom: 2px; right: 2px;
+    font-size: 10px;
+    font-weight: bold;
+}
+
+/* Info Box */
+.enchant-info-box {
+    background: #d0d0d0;
+    padding: 15px;
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+    border: 5px solid #fff; /* Outer white border */
+}
+.info-box-inner {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+.info-icon-placeholder {
+    width: 50px; height: 50px;
+    background: #ccc;
+}
+.info-tags {
+    display: flex;
+    gap: 5px;
+}
+.tag-pill {
+    background: #ccc;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+}
+.info-desc-area {
+    background: #ccc;
+    padding: 10px;
+    font-size: 12px;
+    flex: 1;
+}
+
+.divider {
+    border: 0;
+    border-top: 2px solid #555;
+    margin: 20px 0;
+}
+
+/* Actions */
+.popup-actions {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+.action-btn-square {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+}
+.square-icon {
+    width: 60px; height: 60px;
+}
+.square-icon.light-gray { background: #aaa; }
+.square-icon.dark-gray { background: #888; }
+.action-btn-square span { font-size: 12px; color: #000; }
+
+/* Confirm Box */
+.confirm-box {
+    background: #fff;
+    padding: 0;
+    /* Red borders removed as they were annotations */
+}
+.confirm-title {
+    text-align: center;
+    font-weight: bold;
+    font-size: 18px;
+    padding: 15px;
+}
+.confirm-desc {
+    text-align: center;
+    font-size: 12px;
+    padding: 0 20px 20px 20px;
+    color: #333;
+}
+.confirm-actions {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    padding: 15px;
+    background: #eee;
+}
+.confirm-actions button {
+    padding: 8px 30px;
+    font-weight: bold;
+    color: #fff;
+    border-radius: 4px;
+}
+.btn-yes { background: #aaa; }
+.btn-no { background: #333; }
+
+/* Enchant Selection Full Screen Overlay */
+.enchant-sel-container {
+    width: 100%; height: 100%;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.sel-top-row {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    display: flex;
+}
+.sel-owned-btn {
+    display: flex;
+    background: transparent;
+    cursor: pointer;
+}
+.sel-owned-icon {
+    width: 40px; height: 40px;
+    background: #888;
+}
+.sel-owned-text {
+    background: #fff;
+    color: #000;
+    font-weight: bold;
+    padding: 5px 10px;
+    font-size: 11px;
+    text-align: center;
+}
+
+.sel-center-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    padding: 0 20px;
+}
+.sel-title-pill {
+    background: #e0e0e0;
+    color: #000;
+    font-size: 20px;
+    font-weight: 900;
+    padding: 10px;
+    text-align: center;
+    border-radius: 8px;
+    margin: 0 auto 30px auto;
+    width: 240px;
+}
+.enchant-choices-wrap {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+.enchant-choices {
+    display: flex;
+    gap: 10px;
+    height: 380px; /* Limit height so they don&#x27;t stretch forever */
+}
+.sel-card {
+    background: #fff;
+    width: 110px;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    gap: 10px;
+}
+.sel-card-top {
+    background: #d0d0d0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px 5px;
+}
+.sel-type { font-size: 11px; margin-bottom: 10px; text-align: center; }
+.sel-icon { width: 50px; height: 50px; background: #fff; margin-bottom: 10px; }
+.sel-name { font-size: 11px; text-align: center; }
+
+.sel-card-bottom {
+    background: #d0d0d0;
+    flex: 1;
+    padding: 10px;
+    overflow-y: auto;
+}
+.sel-desc { font-size: 11px; }
+
+.sel-bottom-row {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    margin-top: 30px;
+    width: 100%;
+    max-width: 360px;
+}
+.sel-skip-btn {
+    background: #f0f0f0;
+    padding: 15px 40px;
+    font-weight: bold;
+    font-size: 16px;
+}
+.sel-reroll-btn {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    background: #888;
+    padding: 2px;
+    border: 1px solid #fff;
+    cursor: pointer;
+}
+.reroll-icon { width: 24px; height: 24px; background: #555; }
+.reroll-count { padding: 0 10px; color: #000; font-weight: bold; }
+
+/* Replace Popup Extra */
+.replace-label {
+    text-align: center;
+    font-size: 18px;
+    margin: 10px 0 5px 0;
+}
+.replace-arrow {
+    text-align: center;
+    font-size: 20px;
+    color: #666;
+}
+.enchant-info-box.after {
+    border-color: #ffaa00; /* Yellow highlight border */
+}
+.replace-actions {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+.replace-actions button {
+    padding: 15px 30px;
+    color: #fff;
+    font-size: 16px;
+}
+.btn-dark { background: #666; }
+.btn-light { background: #b0b0b0; }
+
+/* Result Popup */
+.result-container {
+    width: 100%; height: 100%;
+    padding: 40px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.clear-pill {
+    background: #e0e0e0;
+    font-size: 28px;
+    font-weight: 900;
+    padding: 10px 40px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+}
+.result-white-box {
+    width: 100%;
+    background: #fff;
+    padding: 15px;
+    /* Red borders removed as they were annotations */
+}
+.res-section {
+    background: #f0f0f0;
+    margin-bottom: 15px;
+}
+.res-sec-title {
+    background: #d0d0d0;
+    text-align: center;
+    font-weight: bold;
+    padding: 10px;
+    margin: 10px;
+}
+.res-row-2 {
+    display: flex;
+    padding: 0 10px 10px 10px;
+    gap: 10px;
+}
+.res-col { flex: 1; text-align: center; }
+.res-label { font-size: 12px; font-weight: bold; margin-bottom: 5px; }
+.text-center { text-align: center; }
+.res-val-box {
+    background: #c0c0c0;
+    padding: 10px;
+    font-size: 16px;
+}
+.res-top-enchants {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    padding: 10px;
+    background: #c0c0c0;
+    margin: 0 10px 10px 10px;
+}
+.res-top-item { text-align: center; font-size: 11px; }
+.res-icon-box { width: 50px; height: 50px; background: #f0f0f0; margin: 0 auto 5px auto; }
+.res-icon-box.white { background: #fff; }
+
+.res-rewards-wrap {
+    background: #d0d0d0;
+    margin: 0 10px 10px 10px;
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+.res-reward-item { text-align: center; font-size: 14px; }
+
+.res-bottom-actions {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 10px;
+    padding: 10px;
+}
+
+/* Special Wave Alert */
+.wave-alert {
+    position: absolute;
+    top: 250px;
+    left: 0;
+    width: 100%;
+    background: #502b2b; /* Dark reddish-brown */
+    display: none;
+    flex-direction: column;
+    z-index: 100;
+}
+.wave-stripes {
+    height: 12px;
+    width: 100%;
+    background: repeating-linear-gradient(
+        45deg,
+        #cc0000,
+        #cc0000 15px,
+        #502b2b 15px,
+        #502b2b 30px
+    );
+}
+.wave-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    padding: 15px 0;
+}
+.wave-text {
+    font-size: 32px;
+    font-weight: 900;
+    color: #ffffff;
+}
+.warning-icon {
+    font-size: 28px;
+    color: #fff;
+    /* Simulate triangle */
+    display: inline-block;
+}
+
+/* Replace Success Popup */
+.replace-success-box {
+    background: #e0e0e0;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: 2px solid #ccc;
+    width: 280px;
+}
+.rs-icons {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+.rs-icon {
+    width: 60px; height: 60px;
+    background: #fff;
+}
+.rs-icon.new.highlight {
+    border: 3px solid #ffcc00;
+}
+.rs-arrow {
+    font-size: 24px;
+    color: #666;
+}
+.rs-text {
+    font-size: 14px;
+    color: #000;
+}
+
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;!-- External Testing Panel --&gt;
+    &lt;div class=&quot;test-panel&quot;&gt;
+        &lt;h2&gt;TEST PANEL&lt;/h2&gt;
+        &lt;p&gt;게임 외부 테스트용 버튼&lt;/p&gt;
+        &lt;button onclick=&quot;showPopup(&#x27;enchantSelection&#x27;)&quot;&gt;인챈트 선택 열기&lt;/button&gt;
+        &lt;button onclick=&quot;showPopup(&#x27;enchantReplace&#x27;)&quot;&gt;인챈트 교체 열기&lt;/button&gt;
+        &lt;button onclick=&quot;showPopup(&#x27;resultPopup&#x27;)&quot;&gt;정산 팝업 열기&lt;/button&gt;
+        &lt;button onclick=&quot;showSpecialWave(&#x27;monster&#x27;)&quot;&gt;특수 웨이브: 러시&lt;/button&gt;
+        &lt;button onclick=&quot;showSpecialWave(&#x27;boss&#x27;)&quot;&gt;특수 웨이브: 보스&lt;/button&gt;
+    &lt;/div&gt;
+
+    &lt;!-- Main Game Container (9:19.5 Aspect Ratio) --&gt;
+    &lt;div class=&quot;game-container&quot; id=&quot;gameContainer&quot;&gt;
+        
+        &lt;!-- Base Screen --&gt;
+        &lt;div class=&quot;screen base-screen active&quot; id=&quot;baseScreen&quot;&gt;
+            &lt;!-- 1. 전투 구역 --&gt;
+            &lt;div class=&quot;combat-area&quot;&gt;
+                &lt;div class=&quot;punch-hole-margin&quot;&gt;
+                    &lt;div class=&quot;chapter-info&quot;&gt;
+                        &lt;span class=&quot;chapter-pill&quot;&gt;1 챕터&lt;/span&gt;&lt;span class=&quot;stage-pill&quot;&gt;1 스테이지&lt;/span&gt;
+                    &lt;/div&gt;
+                    &lt;button class=&quot;pause-btn&quot; onclick=&quot;showPopup(&#x27;ownedEnchants&#x27;)&quot;&gt;||&lt;/button&gt;
+                &lt;/div&gt;
+                
+                &lt;div class=&quot;combat-scene&quot; id=&quot;combatScene&quot;&gt;
+                    &lt;!-- 플레이어 영역 --&gt;
+                    &lt;div class=&quot;player-wrapper&quot;&gt;
+                        &lt;div class=&quot;player-asset&quot; id=&quot;playerAsset&quot;&gt;&lt;/div&gt;
+                        &lt;div class=&quot;barrier&quot; id=&quot;barrier&quot;&gt;&lt;/div&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+
+            &lt;!-- 체력 바 (화면 가로 전체) --&gt;
+            &lt;div class=&quot;hp-bar-full&quot;&gt;
+                &lt;div class=&quot;hp-text&quot;&gt;10,000 / 10,000&lt;/div&gt;
+            &lt;/div&gt;
+
+            &lt;!-- 3. 소트 구역 --&gt;
+            &lt;div class=&quot;sort-area&quot;&gt;
+                &lt;div class=&quot;sort-top-row&quot;&gt;
+                    &lt;!-- 조합식 (좌측 3칸) --&gt;
+                    &lt;div class=&quot;combo-slots&quot;&gt;
+                        &lt;div class=&quot;combo-slot&quot;&gt;
+                            &lt;div class=&quot;c-unit blue&quot;&gt;&lt;/div&gt;&lt;div class=&quot;c-unit yellow&quot;&gt;&lt;/div&gt;&lt;div class=&quot;c-unit red&quot;&gt;&lt;/div&gt;
+                        &lt;/div&gt;
+                        &lt;div class=&quot;combo-slot&quot;&gt;
+                            &lt;div class=&quot;c-unit green&quot;&gt;&lt;/div&gt;&lt;div class=&quot;c-unit blue&quot;&gt;&lt;/div&gt;&lt;div class=&quot;c-unit green&quot;&gt;&lt;/div&gt;
+                        &lt;/div&gt;
+                        &lt;div class=&quot;combo-slot&quot;&gt;
+                            &lt;div class=&quot;c-unit yellow&quot;&gt;&lt;/div&gt;&lt;div class=&quot;c-unit red&quot;&gt;&lt;/div&gt;&lt;div class=&quot;c-unit blue&quot;&gt;&lt;/div&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                    &lt;!-- 조커 유닛 (우측 1칸) --&gt;
+                    &lt;div class=&quot;joker-slot&quot;&gt;&lt;/div&gt;
+                &lt;/div&gt;
+                
+                &lt;div class=&quot;grid-section&quot;&gt;
+                    &lt;!-- 대기 테이블 (1열 4행) --&gt;
+                    &lt;div class=&quot;wait-column&quot;&gt;
+                        &lt;div class=&quot;grid-cell&quot;&gt;&lt;div class=&quot;unit-group&quot;&gt;&lt;div class=&quot;s-unit lightblue&quot;&gt;&lt;/div&gt;&lt;div class=&quot;s-unit yellow&quot;&gt;&lt;/div&gt;&lt;div class=&quot;s-unit red&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;
+                        &lt;div class=&quot;grid-cell&quot;&gt;&lt;/div&gt;
+                        &lt;div class=&quot;grid-cell&quot;&gt;&lt;/div&gt;
+                        &lt;div class=&quot;grid-cell&quot;&gt;&lt;/div&gt;
+                    &lt;/div&gt;
+                    &lt;!-- 퍼즐 보드 (3열 4행) --&gt;
+                    &lt;div class=&quot;puzzle-grid&quot;&gt;
+                        &lt;div class=&quot;grid-cell&quot;&gt;&lt;div class=&quot;unit-group&quot;&gt;&lt;div class=&quot;s-unit lightblue&quot;&gt;&lt;/div&gt;&lt;div class=&quot;s-unit yellow&quot;&gt;&lt;/div&gt;&lt;div class=&quot;s-unit red&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;
+                        &lt;div class=&quot;grid-cell&quot;&gt;&lt;div class=&quot;unit-group&quot;&gt;&lt;div class=&quot;s-unit lightblue&quot;&gt;&lt;/div&gt;&lt;div class=&quot;s-unit yellow&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;
+                        &lt;div class=&quot;grid-cell&quot;&gt;&lt;div class=&quot;unit-group&quot;&gt;&lt;div class=&quot;s-unit lightblue&quot;&gt;&lt;/div&gt;&lt;div class=&quot;s-unit red&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;
+                        
+                        &lt;div class=&quot;grid-cell&quot;&gt;&lt;/div&gt;
+                        &lt;div class=&quot;grid-cell&quot;&gt;&lt;div class=&quot;unit-group&quot;&gt;&lt;div class=&quot;s-unit red&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;
+                        &lt;div class=&quot;grid-cell&quot;&gt;&lt;/div&gt;
+                        
+                        &lt;div class=&quot;grid-cell&quot;&gt;&lt;/div&gt;
+                        &lt;div class=&quot;grid-cell&quot;&gt;&lt;/div&gt;
+                        &lt;div class=&quot;grid-cell&quot;&gt;&lt;/div&gt;
+                        
+                        &lt;div class=&quot;grid-cell&quot;&gt;&lt;/div&gt;
+                        &lt;div class=&quot;grid-cell&quot;&gt;&lt;/div&gt;
+                        &lt;div class=&quot;grid-cell&quot;&gt;&lt;/div&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;
+
+                &lt;!-- 캐릭터 레벨 및 경험치 게이지 --&gt;
+                &lt;div class=&quot;exp-section&quot;&gt;
+                    &lt;div class=&quot;level-text&quot;&gt;레벨 1&lt;/div&gt;
+                    &lt;div class=&quot;exp-gauge-bg&quot;&gt;
+                        &lt;div class=&quot;exp-gauge-fill&quot; style=&quot;width: 60%;&quot;&gt;&lt;/div&gt;
+                    &lt;/div&gt;
+                    &lt;div class=&quot;exp-value&quot;&gt;0 / 100&lt;/div&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+
+        &lt;!-- Popups Layer --&gt;
+        &lt;!-- 특수 웨이브 알림 --&gt;
+        &lt;div class=&quot;wave-alert&quot; id=&quot;waveAlert&quot;&gt;
+            &lt;div class=&quot;wave-stripes&quot;&gt;&lt;/div&gt;
+            &lt;div class=&quot;wave-content&quot;&gt;
+                &lt;div class=&quot;warning-icon&quot;&gt;⚠&lt;/div&gt;
+                &lt;span class=&quot;wave-text&quot; id=&quot;waveText&quot;&gt;몬스터 러시&lt;/span&gt;
+                &lt;div class=&quot;warning-icon&quot;&gt;⚠&lt;/div&gt;
+            &lt;/div&gt;
+            &lt;div class=&quot;wave-stripes&quot;&gt;&lt;/div&gt;
+        &lt;/div&gt;
+
+        &lt;!-- 2. 보유 인챈트 팝업 --&gt;
+        &lt;div class=&quot;popup-overlay&quot; id=&quot;ownedEnchants&quot; onclick=&quot;hidePopup(&#x27;ownedEnchants&#x27;)&quot;&gt;
+            &lt;div class=&quot;popup-box owned-popup&quot; onclick=&quot;event.stopPropagation()&quot;&gt;
+                &lt;button class=&quot;close-btn-x&quot; onclick=&quot;hidePopup(&#x27;ownedEnchants&#x27;)&quot;&gt;X&lt;/button&gt;
+                &lt;div class=&quot;popup-title&quot;&gt;보유 인챈트&lt;/div&gt;
+                
+                &lt;div class=&quot;popup-tabs&quot;&gt;
+                    &lt;div class=&quot;tab-btn active&quot; onclick=&quot;switchTab(&#x27;skill&#x27;)&quot;&gt;스킬 인챈트&lt;/div&gt;
+                    &lt;div class=&quot;tab-btn inactive&quot; onclick=&quot;switchTab(&#x27;stat&#x27;)&quot;&gt;스탯 인챈트&lt;/div&gt;
+                &lt;/div&gt;
+                
+                &lt;div class=&quot;popup-content-box&quot;&gt;
+                    &lt;div class=&quot;enchant-list-container&quot; id=&quot;ownedEnchantList&quot;&gt;
+                        &lt;!-- JS 렌더링 --&gt;
+                    &lt;/div&gt;
+                    
+                    &lt;div class=&quot;enchant-info-box&quot; id=&quot;ownedEnchantInfo&quot;&gt;
+                        &lt;!-- JS 렌더링 --&gt;
+                    &lt;/div&gt;
+                    &lt;hr class=&quot;divider&quot;&gt;
+                    
+                    &lt;div class=&quot;popup-actions bottom-actions&quot;&gt;
+                        &lt;div class=&quot;action-btn-square&quot; onclick=&quot;hidePopup(&#x27;ownedEnchants&#x27;)&quot;&gt;
+                            &lt;div class=&quot;square-icon light-gray&quot;&gt;&lt;/div&gt;
+                            &lt;span&gt;이어하기&lt;/span&gt;
+                        &lt;/div&gt;
+                        &lt;div class=&quot;action-btn-square&quot; onclick=&quot;showPopup(&#x27;lobbyConfirm&#x27;)&quot;&gt;
+                            &lt;div class=&quot;square-icon dark-gray&quot;&gt;&lt;/div&gt;
+                            &lt;span&gt;로비로 복귀&lt;/span&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+
+        &lt;!-- 로비 복귀 확인 팝업 (안내) --&gt;
+        &lt;div class=&quot;popup-overlay z-high&quot; id=&quot;lobbyConfirm&quot;&gt;
+            &lt;div class=&quot;popup-box confirm-popup&quot;&gt;
+                &lt;button class=&quot;close-btn-x&quot; onclick=&quot;hidePopup(&#x27;lobbyConfirm&#x27;)&quot;&gt;X&lt;/button&gt;
+                &lt;div class=&quot;popup-title&quot;&gt;보유 인챈트&lt;/div&gt;
+                
+                &lt;div class=&quot;popup-content-box confirm-box&quot;&gt;
+                    &lt;div class=&quot;confirm-title&quot;&gt;안내&lt;/div&gt;
+                    &lt;div class=&quot;confirm-desc&quot;&gt;
+                        소모된 행동력은 복구되지 않습니다.&lt;br&gt;전투를 포기하고 로비로 복귀하시겠습니까?
+                    &lt;/div&gt;
+                    
+                    &lt;div class=&quot;confirm-actions&quot;&gt;
+                        &lt;button class=&quot;btn-yes&quot; onclick=&quot;alert(&#x27;로비로 이동합니다.&#x27;); hideAllPopups();&quot;&gt;예&lt;/button&gt;
+                        &lt;button class=&quot;btn-no&quot; onclick=&quot;hidePopup(&#x27;lobbyConfirm&#x27;)&quot;&gt;아니오&lt;/button&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+
+        &lt;!-- 3. 인챈트 선택 팝업 --&gt;
+        &lt;div class=&quot;popup-overlay&quot; id=&quot;enchantSelection&quot;&gt;
+            &lt;div class=&quot;enchant-sel-container&quot;&gt;
+                &lt;div class=&quot;sel-top-row&quot;&gt;
+                    &lt;div class=&quot;sel-owned-btn&quot; onclick=&quot;showPopup(&#x27;ownedEnchantsInfoOnly&#x27;)&quot;&gt;
+                        &lt;div class=&quot;sel-owned-icon&quot;&gt;&lt;/div&gt;
+                        &lt;div class=&quot;sel-owned-text&quot;&gt;보유&lt;br&gt;인챈트&lt;/div&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;
+                
+                &lt;div class=&quot;sel-center-group&quot;&gt;
+                    &lt;div class=&quot;sel-title-pill&quot;&gt;스킬 인챈트 선택&lt;/div&gt;
+                    
+                    &lt;div class=&quot;enchant-choices-wrap&quot;&gt;
+                        &lt;div class=&quot;enchant-choices&quot; id=&quot;enchantChoices&quot;&gt;
+                            &lt;!-- JS 렌더링 --&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                    
+                    &lt;div class=&quot;sel-bottom-row&quot;&gt;
+                        &lt;button class=&quot;sel-skip-btn&quot; onclick=&quot;hidePopup(&#x27;enchantSelection&#x27;)&quot;&gt;미선택&lt;/button&gt;
+                        &lt;div class=&quot;sel-reroll-btn&quot; onclick=&quot;alert(&#x27;리롤!&#x27;)&quot;&gt;
+                            &lt;div class=&quot;reroll-icon&quot;&gt;&lt;/div&gt;
+                            &lt;div class=&quot;reroll-count&quot;&gt;3&lt;/div&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+
+        &lt;!-- 정보 제공용 보유 인챈트 팝업 (선택/교체 시) --&gt;
+        &lt;div class=&quot;popup-overlay z-high&quot; id=&quot;ownedEnchantsInfoOnly&quot; onclick=&quot;hidePopup(&#x27;ownedEnchantsInfoOnly&#x27;)&quot;&gt;
+            &lt;div class=&quot;popup-box owned-popup&quot; onclick=&quot;event.stopPropagation()&quot;&gt;
+                &lt;button class=&quot;close-btn-x&quot; onclick=&quot;hidePopup(&#x27;ownedEnchantsInfoOnly&#x27;)&quot;&gt;X&lt;/button&gt;
+                &lt;div class=&quot;popup-title&quot;&gt;보유 인챈트&lt;/div&gt;
+                &lt;div class=&quot;popup-tabs&quot;&gt;
+                    &lt;div class=&quot;tab-btn active&quot;&gt;스킬 인챈트&lt;/div&gt;
+                    &lt;div class=&quot;tab-btn inactive&quot;&gt;스탯 인챈트&lt;/div&gt;
+                &lt;/div&gt;
+                &lt;div class=&quot;popup-content-box&quot;&gt;
+                    &lt;div class=&quot;enchant-list-container&quot; id=&quot;ownedEnchantListInfoOnly&quot;&gt;
+                        &lt;!-- JS 렌더링 --&gt;
+                    &lt;/div&gt;
+                    &lt;div class=&quot;enchant-info-box&quot; id=&quot;ownedEnchantInfoInfoOnly&quot;&gt;
+                        &lt;div class=&quot;placeholder-info&quot;&gt;정보 확인 전용&lt;/div&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+
+        &lt;!-- 인챈트 교체 팝업 --&gt;
+        &lt;div class=&quot;popup-overlay&quot; id=&quot;enchantReplace&quot; onclick=&quot;hidePopup(&#x27;enchantReplace&#x27;)&quot;&gt;
+            &lt;div class=&quot;popup-box replace-popup&quot; onclick=&quot;event.stopPropagation()&quot;&gt;
+                &lt;button class=&quot;close-btn-x&quot; onclick=&quot;hidePopup(&#x27;enchantReplace&#x27;)&quot;&gt;X&lt;/button&gt;
+                &lt;div class=&quot;popup-title&quot;&gt;인챈트 교체&lt;/div&gt;
+                
+                &lt;div class=&quot;popup-content-box no-pad&quot;&gt;
+                    &lt;div class=&quot;enchant-list-container&quot; id=&quot;replaceOwnedList&quot;&gt;
+                        &lt;!-- JS 렌더링 --&gt;
+                    &lt;/div&gt;
+                    
+                    &lt;div class=&quot;replace-label&quot;&gt;Before&lt;/div&gt;
+                    &lt;div class=&quot;enchant-info-box before&quot; id=&quot;replaceBeforeInfo&quot;&gt;
+                        &lt;div class=&quot;placeholder-info&quot;&gt;교체할 인챈트 선택&lt;/div&gt;
+                    &lt;/div&gt;
+                    
+                    &lt;div class=&quot;replace-arrow&quot;&gt;▼&lt;/div&gt;
+                    
+                    &lt;div class=&quot;replace-label&quot;&gt;After&lt;/div&gt;
+                    &lt;div class=&quot;enchant-info-box after highlight&quot; id=&quot;replaceAfterInfo&quot;&gt;
+                        &lt;!-- JS 렌더링 --&gt;
+                    &lt;/div&gt;
+                    
+                    &lt;hr class=&quot;divider&quot;&gt;
+                    &lt;div class=&quot;replace-actions&quot;&gt;
+                        &lt;button class=&quot;btn-dark&quot; onclick=&quot;executeReplace()&quot;&gt;교체하기&lt;/button&gt;
+                        &lt;button class=&quot;btn-light&quot; onclick=&quot;hidePopup(&#x27;enchantReplace&#x27;)&quot;&gt;취소하기&lt;/button&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+
+        &lt;!-- 교체 완료 알림 팝업 (1.5초) --&gt;
+        &lt;div class=&quot;popup-overlay z-high&quot; id=&quot;replaceSuccessPopup&quot;&gt;
+            &lt;div class=&quot;replace-success-box&quot;&gt;
+                &lt;div class=&quot;rs-icons&quot;&gt;
+                    &lt;div class=&quot;rs-icon old&quot;&gt;&lt;/div&gt;
+                    &lt;div class=&quot;rs-arrow&quot;&gt;▶&lt;/div&gt;
+                    &lt;div class=&quot;rs-icon new highlight&quot;&gt;&lt;/div&gt;
+                &lt;/div&gt;
+                &lt;div class=&quot;rs-text&quot;&gt;인챈트가 교체되었습니다&lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+
+        &lt;!-- 4. 정산 팝업 --&gt;
+        &lt;div class=&quot;popup-overlay&quot; id=&quot;resultPopup&quot;&gt;
+            &lt;div class=&quot;result-container&quot;&gt;
+                &lt;div class=&quot;clear-pill&quot;&gt;CLEAR&lt;/div&gt;
+                
+                &lt;div class=&quot;result-white-box&quot;&gt;
+                    &lt;div class=&quot;res-section record-sec&quot;&gt;
+                        &lt;div class=&quot;res-sec-title&quot;&gt;기록&lt;/div&gt;
+                        &lt;div class=&quot;res-row-2&quot;&gt;
+                            &lt;div class=&quot;res-col&quot;&gt;
+                                &lt;div class=&quot;res-label&quot;&gt;최고 콤보수&lt;/div&gt;
+                                &lt;div class=&quot;res-val-box&quot; id=&quot;resMaxCombo&quot;&gt;1,245&lt;/div&gt;
+                            &lt;/div&gt;
+                            &lt;div class=&quot;res-col&quot;&gt;
+                                &lt;div class=&quot;res-label&quot;&gt;최고 대미지&lt;/div&gt;
+                                &lt;div class=&quot;res-val-box&quot; id=&quot;resMaxDamage&quot;&gt;1,200,000&lt;/div&gt;
+                            &lt;/div&gt;
+                        &lt;/div&gt;
+                        
+                        &lt;div class=&quot;res-label text-center&quot;&gt;인챈트 TOP 3&lt;/div&gt;
+                        &lt;div class=&quot;res-top-enchants&quot; id=&quot;resTopEnchants&quot;&gt;
+                            &lt;!-- JS 렌더링 --&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                    
+                    &lt;div class=&quot;res-section reward-sec&quot;&gt;
+                        &lt;div class=&quot;res-sec-title&quot;&gt;보상&lt;/div&gt;
+                        &lt;div class=&quot;res-rewards-wrap&quot; id=&quot;resRewards&quot;&gt;
+                            &lt;!-- JS 렌더링 --&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                    
+                    &lt;div class=&quot;res-bottom-actions&quot;&gt;
+                        &lt;div class=&quot;action-btn-square&quot; onclick=&quot;alert(&#x27;다시 시작합니다.&#x27;); hideAllPopups();&quot;&gt;
+                            &lt;div class=&quot;square-icon dark-gray&quot;&gt;&lt;/div&gt;
+                            &lt;span&gt;다시하기&lt;/span&gt;
+                        &lt;/div&gt;
+                        &lt;div class=&quot;action-btn-square&quot; onclick=&quot;alert(&#x27;다음 챕터 진행.&#x27;); hideAllPopups();&quot;&gt;
+                            &lt;div class=&quot;square-icon dark-gray&quot;&gt;&lt;/div&gt;
+                            &lt;span&gt;다음 챕터 진행&lt;/span&gt;
+                        &lt;/div&gt;
+                        &lt;div class=&quot;action-btn-square&quot; onclick=&quot;showPopup(&#x27;lobbyConfirm&#x27;)&quot;&gt;
+                            &lt;div class=&quot;square-icon dark-gray&quot;&gt;&lt;/div&gt;
+                            &lt;span&gt;로비로 복귀&lt;/span&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+
+    &lt;/div&gt;
+
+    &lt;script&gt;
+// --- Dummy Data ---
+const skillEnchants = [
+    { id: 1, name: &#x27;파이어 볼&#x27;, type: &#x27;스킬&#x27;, desc: &#x27;전방에 화염구를 발사하여 넓은 범위의 적에게 데미지를 입힙니다.&#x27;, level: 3 },
+    { id: 2, name: &#x27;체인 라이트닝&#x27;, type: &#x27;스킬&#x27;, desc: &#x27;적들 사이를 튕기는 연쇄 번개를 발사합니다.&#x27;, level: 5 },
+    { id: 3, name: &#x27;토네이도&#x27;, type: &#x27;스킬&#x27;, desc: &#x27;경로 상의 적을 밀쳐내며 지속 데미지를 줍니다.&#x27;, level: 1 },
+    { id: 4, name: &#x27;프로스트 노바&#x27;, type: &#x27;스킬&#x27;, desc: &#x27;주변의 적들을 얼려 이동속도를 감소시킵니다.&#x27;, level: 2 },
+    { id: 5, name: &#x27;마력검&#x27;, type: &#x27;스킬&#x27;, desc: &#x27;마력이 깃든 검을 소환하여 근접한 적을 벱니다.&#x27;, level: 4 }
+];
+
+const statEnchants = [
+    { id: 6, name: &#x27;체력 증진&#x27;, type: &#x27;스탯&#x27;, desc: &#x27;방벽의 최대 체력이 20% 증가합니다.&#x27;, level: 2 },
+    { id: 7, name: &#x27;강철 방벽&#x27;, type: &#x27;스탯&#x27;, desc: &#x27;방벽이 받는 데미지가 15% 감소합니다.&#x27;, level: 1 },
+    { id: 8, name: &#x27;마력 재생&#x27;, type: &#x27;스탯&#x27;, desc: &#x27;스킬 쿨타임이 10% 감소합니다.&#x27;, level: 3 }
+];
+
+let ownedSkills = [skillEnchants[0], skillEnchants[1], skillEnchants[2], skillEnchants[3], null];
+let ownedStats = [statEnchants[0], statEnchants[1], null, null, null];
+
+// --- Popups Management ---
+function showPopup(popupId) {
+    const popup = document.getElementById(popupId);
+    if(popup) {
+        popup.classList.add(&#x27;active&#x27;);
+        if(popupId === &#x27;ownedEnchants&#x27; || popupId === &#x27;ownedEnchantsInfoOnly&#x27;) {
+            switchTab(&#x27;skill&#x27;, popupId);
+        } else if (popupId === &#x27;enchantSelection&#x27;) {
+            renderEnchantChoices();
+        } else if (popupId === &#x27;enchantReplace&#x27;) {
+            renderReplaceOwnedList();
+            renderReplaceAfterInfo(skillEnchants[2]);
+        } else if (popupId === &#x27;resultPopup&#x27;) {
+            renderResultPopup();
+        }
+    }
+}
+
+function hidePopup(popupId) {
+    const popup = document.getElementById(popupId);
+    if(popup) popup.classList.remove(&#x27;active&#x27;);
+}
+
+function hideAllPopups() {
+    document.querySelectorAll(&#x27;.popup-overlay&#x27;).forEach(p =&gt; p.classList.remove(&#x27;active&#x27;));
+}
+
+// --- Owned Enchants Tab Logic ---
+function switchTab(tabType, popupId = &#x27;ownedEnchants&#x27;) {
+    const popup = document.getElementById(popupId);
+    if(!popup) return;
+    
+    const tabs = popup.querySelectorAll(&#x27;.tab-btn&#x27;);
+    tabs.forEach(t =&gt; {
+        t.classList.remove(&#x27;active&#x27;);
+        t.classList.add(&#x27;inactive&#x27;);
+    });
+    
+    const isSkill = tabType === &#x27;skill&#x27;;
+    tabs[isSkill ? 0 : 1].classList.add(&#x27;active&#x27;);
+    tabs[isSkill ? 0 : 1].classList.remove(&#x27;inactive&#x27;);
+    
+    const listContainerId = popupId === &#x27;ownedEnchants&#x27; ? &#x27;ownedEnchantList&#x27; : &#x27;ownedEnchantListInfoOnly&#x27;;
+    const infoContainerId = popupId === &#x27;ownedEnchants&#x27; ? &#x27;ownedEnchantInfo&#x27; : &#x27;ownedEnchantInfoInfoOnly&#x27;;
+    
+    const listContainer = document.getElementById(listContainerId);
+    listContainer.innerHTML = &#x27;&#x27;;
+    
+    const dataList = isSkill ? ownedSkills : ownedStats;
+    const maxSlots = 5;
+    
+    for (let i = 0; i &lt; maxSlots; i++) {
+        const item = dataList[i];
+        const div = document.createElement(&#x27;div&#x27;);
+        div.className = &#x27;enchant-slot-square &#x27; + (item ? &#x27;&#x27; : &#x27;empty&#x27;);
+        if(item) {
+            div.innerHTML = `&lt;div class=&quot;enchant-lv-text&quot;&gt;Lv.${item.level}&lt;/div&gt;`;
+            div.onclick = () =&gt; selectEnchant(item, div, infoContainerId);
+        }
+        listContainer.appendChild(div);
+    }
+    
+    document.getElementById(infoContainerId).innerHTML = `
+        &lt;div style=&quot;text-align:center; padding-top:40px; font-size:14px; color:#666;&quot;&gt;인챈트를 선택하세요&lt;/div&gt;
+    `;
+}
+
+function selectEnchant(item, element, infoContainerId) {
+    const container = element.parentElement;
+    container.querySelectorAll(&#x27;.enchant-slot-square&#x27;).forEach(el =&gt; el.classList.remove(&#x27;active&#x27;));
+    element.classList.add(&#x27;active&#x27;);
+    
+    const infoBox = document.getElementById(infoContainerId);
+    infoBox.innerHTML = `
+        &lt;div class=&quot;info-box-inner&quot;&gt;
+            &lt;div class=&quot;info-icon-placeholder&quot;&gt;&lt;/div&gt;
+            &lt;div&gt;
+                &lt;div class=&quot;info-tags&quot;&gt;
+                    &lt;div class=&quot;tag-pill&quot;&gt;${item.name}&lt;/div&gt;
+                    &lt;div class=&quot;tag-pill&quot;&gt;${item.type}&lt;/div&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;info-desc-area&quot;&gt;${item.desc}&lt;/div&gt;
+    `;
+}
+
+// --- Enchant Selection Popup ---
+function renderEnchantChoices() {
+    const container = document.getElementById(&#x27;enchantChoices&#x27;);
+    container.innerHTML = &#x27;&#x27;;
+    
+    const choices = [skillEnchants[1], skillEnchants[3], statEnchants[0]];
+    
+    choices.forEach(item =&gt; {
+        const card = document.createElement(&#x27;div&#x27;);
+        card.className = &#x27;sel-card&#x27;;
+        card.innerHTML = `
+            &lt;div class=&quot;sel-card-top&quot;&gt;
+                &lt;div class=&quot;sel-type&quot;&gt;${item.type} 종류&lt;/div&gt;
+                &lt;div class=&quot;sel-icon&quot;&gt;&lt;/div&gt;
+                &lt;div class=&quot;sel-name&quot;&gt;${item.name}&lt;/div&gt;
+            &lt;/div&gt;
+            &lt;div class=&quot;sel-card-bottom&quot;&gt;
+                &lt;div class=&quot;sel-desc&quot;&gt;${item.desc}&lt;/div&gt;
+            &lt;/div&gt;
+        `;
+        card.onclick = () =&gt; {
+            alert(`[${item.name}] 획득!`);
+            hidePopup(&#x27;enchantSelection&#x27;);
+        };
+        container.appendChild(card);
+    });
+}
+
+// --- Enchant Replace Popup ---
+let selectedReplaceBefore = null;
+
+function renderReplaceOwnedList() {
+    const container = document.getElementById(&#x27;replaceOwnedList&#x27;);
+    container.innerHTML = &#x27;&#x27;;
+    
+    ownedSkills.forEach((item, index) =&gt; {
+        const div = document.createElement(&#x27;div&#x27;);
+        div.className = &#x27;enchant-slot-square &#x27; + (item ? &#x27;&#x27; : &#x27;empty&#x27;);
+        if(item) {
+            div.innerHTML = `&lt;div class=&quot;enchant-lv-text&quot;&gt;Lv.${item.level}&lt;/div&gt;`;
+            div.onclick = () =&gt; {
+                container.querySelectorAll(&#x27;.enchant-slot-square&#x27;).forEach(el =&gt; el.classList.remove(&#x27;active&#x27;));
+                div.classList.add(&#x27;active&#x27;);
+                selectedReplaceBefore = item;
+                renderReplaceBeforeInfo(item);
+            };
+        }
+        container.appendChild(div);
+    });
+    
+    document.getElementById(&#x27;replaceBeforeInfo&#x27;).innerHTML = `&lt;div style=&quot;text-align:center; padding-top:40px; font-size:14px; color:#666;&quot;&gt;교체할 기존 인챈트 선택&lt;/div&gt;`;
+}
+
+function renderReplaceBeforeInfo(item) {
+    const infoBox = document.getElementById(&#x27;replaceBeforeInfo&#x27;);
+    infoBox.innerHTML = `
+        &lt;div class=&quot;info-box-inner&quot;&gt;
+            &lt;div class=&quot;info-icon-placeholder&quot;&gt;&lt;/div&gt;
+            &lt;div&gt;
+                &lt;div class=&quot;info-tags&quot;&gt;
+                    &lt;div class=&quot;tag-pill&quot;&gt;${item.name}&lt;/div&gt;
+                    &lt;div class=&quot;tag-pill&quot;&gt;${item.type}&lt;/div&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;info-desc-area&quot;&gt;${item.desc}&lt;/div&gt;
+    `;
+}
+
+function renderReplaceAfterInfo(item) {
+    const infoBox = document.getElementById(&#x27;replaceAfterInfo&#x27;);
+    infoBox.innerHTML = `
+        &lt;div class=&quot;info-box-inner&quot;&gt;
+            &lt;div class=&quot;info-icon-placeholder&quot;&gt;&lt;/div&gt;
+            &lt;div&gt;
+                &lt;div class=&quot;info-tags&quot;&gt;
+                    &lt;div class=&quot;tag-pill&quot;&gt;${item.name}&lt;/div&gt;
+                    &lt;div class=&quot;tag-pill&quot;&gt;${item.type}&lt;/div&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;info-desc-area&quot;&gt;${item.desc}&lt;/div&gt;
+    `;
+}
+
+function executeReplace() {
+    if(!selectedReplaceBefore) {
+        alert(&quot;교체할 기존 인챈트를 선택해주세요!&quot;);
+        return;
+    }
+    
+    hidePopup(&#x27;enchantReplace&#x27;);
+    
+    const successPopup = document.getElementById(&#x27;replaceSuccessPopup&#x27;);
+    successPopup.classList.add(&#x27;active&#x27;);
+    
+    setTimeout(() =&gt; {
+        successPopup.classList.remove(&#x27;active&#x27;);
+    }, 1500);
+}
+
+// --- Result Popup Rendering ---
+function formatNumber(num) {
+    if (num &gt;= 1000000) {
+        let val = Math.floor(num / 100000) / 10;
+        return val.toFixed(1) + &#x27; M&#x27;;
+    } else if (num &gt;= 1000) {
+        let val = Math.floor(num / 100) / 10;
+        return val.toFixed(1) + &#x27; K&#x27;;
+    }
+    return num.toString();
+}
+
+function renderResultPopup() {
+    // Dummy Data for result
+    const maxCombo = 1245;
+    const maxDamage = 4380000; 
+    
+    const topEnchants = [
+        { dmg: 4900 },
+        { dmg: 4300 },
+        { dmg: 1200 }
+    ];
+    
+    const rewards = {
+        gold: 14500,
+        scrolls: 10
+    };
+    
+    document.getElementById(&#x27;resMaxCombo&#x27;).innerText = formatNumber(maxCombo);
+    document.getElementById(&#x27;resMaxDamage&#x27;).innerText = formatNumber(maxDamage);
+    
+    const topContainer = document.getElementById(&#x27;resTopEnchants&#x27;);
+    topContainer.innerHTML = &#x27;&#x27;;
+    topEnchants.forEach(ench =&gt; {
+        topContainer.innerHTML += `
+            &lt;div class=&quot;res-top-item&quot;&gt;
+                &lt;div class=&quot;res-icon-box&quot;&gt;&lt;/div&gt;
+                &lt;div&gt;가한 대미지&lt;br&gt;${formatNumber(ench.dmg)}&lt;/div&gt;
+            &lt;/div&gt;
+        `;
+    });
+    
+    const rewardContainer = document.getElementById(&#x27;resRewards&#x27;);
+    rewardContainer.innerHTML = `
+        &lt;div class=&quot;res-reward-item&quot;&gt;
+            &lt;div class=&quot;res-icon-box white&quot;&gt;&lt;/div&gt;
+            &lt;div&gt;${formatNumber(rewards.gold)}&lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;res-reward-item&quot;&gt;
+            &lt;div class=&quot;res-icon-box white&quot;&gt;&lt;/div&gt;
+            &lt;div&gt;${rewards.scrolls}&lt;/div&gt; &lt;!-- Scrolls usually don&#x27;t need K/M formatting if they are small numbers --&gt;
+        &lt;/div&gt;
+    `;
+}
+
+function showSpecialWave(type) {
+    const alertBox = document.getElementById(&#x27;waveAlert&#x27;);
+    const waveText = document.getElementById(&#x27;waveText&#x27;);
+    
+    if(type === &#x27;monster&#x27;) waveText.innerText = &#x27;몬스터 러시&#x27;;
+    if(type === &#x27;boss&#x27;) waveText.innerText = &#x27;보스 몬스터 출현&#x27;;
+    
+    alertBox.style.display = &#x27;flex&#x27;;
+    
+    setTimeout(() =&gt; {
+        alertBox.style.display = &#x27;none&#x27;;
+    }, 2000);
+}
+
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+"></iframe>
+  <iframe id="simPanel" class="panel" title="인챈트 시스템 시뮬레이터" srcdoc="&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;ko&quot;&gt;
+&lt;head&gt;
+    &lt;meta charset=&quot;UTF-8&quot;&gt;
+    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
+    &lt;title&gt;로그라이크 인챈트 시스템 검증 v2 (교체 추가)&lt;/title&gt;
+    &lt;style&gt;
+        body { font-family: &#x27;Malgun Gothic&#x27;, sans-serif; background-color: #1e1e24; color: #fff; margin: 0; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        h1, h2 { color: #fca311; }
+        .panel { background-color: #2b2d42; padding: 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        
+        .inventory-list { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+        .item-card { background-color: #4a4e69; border: 2px solid #9a8c98; border-radius: 6px; padding: 15px; width: 120px; text-align: center; position: relative; }
+        .item-card.empty { background-color: #2b2d42; border: 2px dashed #4a4e69; color: #4a4e69; }
+        .item-id { font-size: 1.2em; font-weight: bold; margin-bottom: 5px; }
+        .item-level { color: #fca311; font-weight: bold; }
+        .cat-A { color: #8ecae6; } /* 일반 */
+        .cat-B { color: #ffb703; } /* 조합 */
+        .cat-C { color: #ff006e; } /* 콤보 */
+
+        .btn { background-color: #fca311; color: #14213d; border: none; padding: 10px 20px; font-size: 1em; font-weight: bold; border-radius: 4px; cursor: pointer; transition: 0.2s; }
+        .btn:hover { background-color: #e59800; }
+        .btn:disabled { background-color: #555; cursor: not-allowed; }
+
+        .choices-container { display: flex; gap: 15px; justify-content: center; margin-top: 20px; }
+        .choice-card { background-color: #22223b; border: 2px solid #fca311; border-radius: 8px; padding: 20px; width: 150px; text-align: center; cursor: pointer; transition: 0.2s; }
+        .choice-card:hover { transform: translateY(-5px); background-color: #4a4e69; }
+        .choice-reason { font-size: 0.8em; color: #9a8c98; margin-top: 10px; }
+
+        #replace-modal { display: none; background-color: rgba(0,0,0,0.8); position: fixed; top: 0; left: 0; width: 100%; height: 100%; justify-content: center; align-items: center; z-index: 100; }
+        .modal-content { background-color: #2b2d42; padding: 30px; border-radius: 8px; text-align: center; max-width: 600px; }
+        .replace-list { display: flex; gap: 10px; justify-content: center; margin: 20px 0; flex-wrap: wrap; }
+        .replace-item { cursor: pointer; border-color: #ff006e; }
+        .replace-item:not(.disabled):hover { background-color: #ff006e; color: white; }
+        .replace-item.disabled { opacity: 0.4; cursor: not-allowed; border-color: #555; }
+        
+        .log-box { font-size: 0.9em; color: #ced4da; height: 150px; overflow-y: auto; background-color: #14213d; padding: 10px; border-radius: 4px; margin-top: 10px; }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+&lt;div class=&quot;container&quot;&gt;
+    &lt;h1&gt;🎲 로그라이크 인챈트 시뮬레이터 v2&lt;/h1&gt;
+    &lt;p&gt;가중치 규칙: 카테고리(미보유70/보유30) -&gt; 개별스킬(보유80/미보유20)&lt;br&gt;
+    &lt;span style=&quot;color:#ffb703; font-size:0.9em;&quot;&gt;* B스킬이 3개여도 신규 B스킬이 뜹니다. 단, 선택 시 기존 B스킬과 교체해야 합니다.&lt;/span&gt;&lt;/p&gt;
+
+    &lt;div class=&quot;panel&quot;&gt;
+        &lt;h2&gt;보유 중인 스킬 인챈트 (&lt;span id=&quot;inv-count&quot;&gt;0&lt;/span&gt;/5)&lt;/h2&gt;
+        &lt;div class=&quot;inventory-list&quot; id=&quot;inventory-ui&quot;&gt;
+            &lt;!-- 보유 스킬 렌더링 --&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;div class=&quot;panel&quot; style=&quot;text-align: center;&quot;&gt;
+        &lt;button class=&quot;btn&quot; id=&quot;btn-roll&quot; onclick=&quot;rollChoices()&quot;&gt;전투 종료 -&gt; 인챈트 3개 뽑기&lt;/button&gt;
+        &lt;button class=&quot;btn&quot; style=&quot;background-color: #d62828; color: white;&quot; onclick=&quot;resetGame()&quot;&gt;초기화&lt;/button&gt;
+        
+        &lt;div class=&quot;choices-container&quot; id=&quot;choices-ui&quot;&gt;
+            &lt;!-- 선택지 렌더링 --&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;div class=&quot;panel&quot;&gt;
+        &lt;h2&gt;시스템 로그&lt;/h2&gt;
+        &lt;div class=&quot;log-box&quot; id=&quot;sys-log&quot;&gt;&lt;/div&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;!-- 교체 모달 --&gt;
+&lt;div id=&quot;replace-modal&quot;&gt;
+    &lt;div class=&quot;modal-content&quot;&gt;
+        &lt;h2 id=&quot;replace-title&quot;&gt;스킬 교체 필요!&lt;/h2&gt;
+        &lt;p id=&quot;replace-msg&quot;&gt;&lt;/p&gt;
+        &lt;div class=&quot;replace-list&quot; id=&quot;replace-list-ui&quot;&gt;&lt;/div&gt;
+        &lt;button class=&quot;btn&quot; onclick=&quot;cancelReplace()&quot;&gt;선택 취소&lt;/button&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;script&gt;
+    const MAX_INVENTORY = 5;
+    const MAX_LEVEL = 3;
+    const MAX_COMBO_B = 3;
+
+    const WEIGHT_CAT_UNOWNED = 70; 
+    const WEIGHT_CAT_OWNED = 30;   
+    const WEIGHT_ITEM_OWNED = 80;  
+    const WEIGHT_ITEM_UNOWNED = 20; 
+
+    let inventory = []; 
+    let pendingSkill = null; 
+
+    function log(msg) {
+        const logBox = document.getElementById(&#x27;sys-log&#x27;);
+        logBox.innerHTML = `&lt;div&gt;${msg}&lt;/div&gt;` + logBox.innerHTML;
+    }
+
+    function resetGame() {
+        inventory = [];
+        document.getElementById(&#x27;choices-ui&#x27;).innerHTML = &#x27;&#x27;;
+        log(&quot;🔄 게임이 초기화되었습니다.&quot;);
+        updateUI();
+    }
+
+    function weightedRandom(items, weights) {
+        let total = weights.reduce((a, b) =&gt; a + b, 0);
+        let r = Math.random() * total;
+        for (let i = 0; i &lt; items.length; i++) {
+            if (r &lt; weights[i]) return items[i];
+            r -= weights[i];
+        }
+        return items[items.length - 1];
+    }
+
+    function getValidItems(cat, currentChoices) {
+        let validItems = [];
+        for (let i = 1; i &lt;= 10; i++) {
+            let id = `${cat}-${i}`;
+            if (currentChoices.includes(id)) continue; 
+
+            let invItem = inventory.find(item =&gt; item.id === id);
+            // 만렙 스킬은 제외
+            if (invItem &amp;&amp; invItem.level &gt;= MAX_LEVEL) continue;
+
+            // [수정됨] B스킬이 3개 꽉 찼어도, 신규 B스킬 등장을 막지 않음!
+            // 기존에 있던 if (cat === &#x27;B&#x27; &amp;&amp; !invItem &amp;&amp; countB &gt;= MAX_COMBO_B) continue; 삭제
+
+            validItems.push(id);
+        }
+        return validItems;
+    }
+
+    function rollChoices() {
+        document.getElementById(&#x27;choices-ui&#x27;).innerHTML = &#x27;&#x27;;
+        let choices = [];
+        let reasons = [];
+        let attempts = 0;
+        
+        while(choices.length &lt; 3 &amp;&amp; attempts &lt; 100) {
+            attempts++;
+            
+            let availableCats = [&#x27;A&#x27;, &#x27;B&#x27;, &#x27;C&#x27;].filter(cat =&gt; getValidItems(cat, choices).length &gt; 0);
+            if(availableCats.length === 0) break; 
+
+            let catWeights = availableCats.map(cat =&gt; {
+                return inventory.some(item =&gt; item.category === cat) ? WEIGHT_CAT_OWNED : WEIGHT_CAT_UNOWNED;
+            });
+            
+            let selectedCat = weightedRandom(availableCats, catWeights);
+            
+            let validItems = getValidItems(selectedCat, choices);
+            let ownedItems = validItems.filter(id =&gt; inventory.some(item =&gt; item.id === id));
+            let unownedItems = validItems.filter(id =&gt; !inventory.some(item =&gt; item.id === id));
+
+            let selectedItem = null;
+            let pickReason = &quot;&quot;;
+
+            if (ownedItems.length &gt; 0 &amp;&amp; unownedItems.length &gt; 0) {
+                if (Math.random() * 100 &lt; WEIGHT_ITEM_OWNED) {
+                    selectedItem = ownedItems[Math.floor(Math.random() * ownedItems.length)];
+                    pickReason = &quot;보유 스킬 레벨업 (80%)&quot;;
+                } else {
+                    selectedItem = unownedItems[Math.floor(Math.random() * unownedItems.length)];
+                    pickReason = &quot;신규 스킬 발견 (20%)&quot;;
+                }
+            } else if (ownedItems.length &gt; 0) {
+                selectedItem = ownedItems[Math.floor(Math.random() * ownedItems.length)];
+                pickReason = &quot;보유 스킬만 남음&quot;;
+            } else if (unownedItems.length &gt; 0) {
+                selectedItem = unownedItems[Math.floor(Math.random() * unownedItems.length)];
+                pickReason = &quot;미보유 스킬만 남음&quot;;
+            }
+
+            if (selectedItem &amp;&amp; !choices.includes(selectedItem)) {
+                choices.push(selectedItem);
+                let catReason = inventory.some(item =&gt; item.category === selectedCat) ? &quot;보유그룹(30%)&quot; : &quot;미보유그룹(70%)&quot;;
+                reasons.push(`[${selectedCat}] ${catReason} -&gt; ${pickReason}`);
+            }
+        }
+
+        if(choices.length === 0) {
+            alert(&quot;더 이상 배울 수 있는 스킬이 없습니다! (모두 만렙 등)&quot;);
+            return;
+        }
+
+        renderChoices(choices, reasons);
+        log(`------------- 선택지 롤 완료 -------------`);
+    }
+
+    function renderChoices(choices, reasons) {
+        const container = document.getElementById(&#x27;choices-ui&#x27;);
+        container.innerHTML = &#x27;&#x27;;
+
+        choices.forEach((id, index) =&gt; {
+            let cat = id.split(&#x27;-&#x27;)[0];
+            let invItem = inventory.find(item =&gt; item.id === id);
+            let displayLevel = invItem ? `현재 Lv.${invItem.level} -&gt; Lv.${invItem.level + 1}` : &quot;신규 획득 (Lv.1)&quot;;
+            
+            let card = document.createElement(&#x27;div&#x27;);
+            card.className = &#x27;choice-card&#x27;;
+            card.innerHTML = `
+                &lt;div class=&quot;item-id cat-${cat}&quot;&gt;${id}&lt;/div&gt;
+                &lt;div class=&quot;item-level&quot;&gt;${displayLevel}&lt;/div&gt;
+                &lt;div class=&quot;choice-reason&quot;&gt;${reasons[index]}&lt;/div&gt;
+            `;
+            card.onclick = () =&gt; selectSkill(id, cat);
+            container.appendChild(card);
+            log(`선택지 ${index+1}: ${id} (${reasons[index]})`);
+        });
+    }
+
+    function selectSkill(id, cat) {
+        let invItem = inventory.find(item =&gt; item.id === id);
+        let countB = inventory.filter(item =&gt; item.category === &#x27;B&#x27;).length;
+
+        if (invItem) {
+            invItem.level += 1;
+            log(`✨ ${id} 스킬 레벨업! (Lv.${invItem.level})`);
+            document.getElementById(&#x27;choices-ui&#x27;).innerHTML = &#x27;&#x27;; 
+            updateUI();
+        } else {
+            // [수정됨] 신규 획득 시 교체 조건 검사
+            let isInvFull = inventory.length &gt;= MAX_INVENTORY;
+            let isBFull = (cat === &#x27;B&#x27; &amp;&amp; countB &gt;= MAX_COMBO_B); // B가 3개인데 신규 B를 뽑았을 때
+
+            if (isInvFull || isBFull) {
+                pendingSkill = { id: id, category: cat, level: 1 };
+                // B스킬 제한 때문에 교체하는 거면 반드시 B스킬을 버리도록 강제 (forceCategory = &#x27;B&#x27;)
+                let forceCategory = isBFull ? &#x27;B&#x27; : null;
+                showReplaceModal(forceCategory);
+            } else {
+                inventory.push({ id: id, category: cat, level: 1 });
+                log(`➕ ${id} 신규 스킬 획득!`);
+                document.getElementById(&#x27;choices-ui&#x27;).innerHTML = &#x27;&#x27;;
+                updateUI();
+            }
+        }
+    }
+
+    // [수정됨] forceCategory 매개변수 추가 (특정 카테고리만 버릴 수 있게 제한)
+    function showReplaceModal(forceCategory = null) {
+        const modal = document.getElementById(&#x27;replace-modal&#x27;);
+        const listUi = document.getElementById(&#x27;replace-list-ui&#x27;);
+        const msgUi = document.getElementById(&#x27;replace-msg&#x27;);
+        listUi.innerHTML = &#x27;&#x27;;
+
+        if (forceCategory === &#x27;B&#x27;) {
+            msgUi.innerHTML = `조합 스킬(B)은 &lt;b&gt;최대 3개&lt;/b&gt;까지만 보유할 수 있습니다.&lt;br&gt;새로운 &lt;b&gt;&lt;span style=&quot;color:#fca311;&quot;&gt;${pendingSkill.id}&lt;/span&gt;&lt;/b&gt; 스킬을 배우려면 기존 B스킬 중 하나를 버려야 합니다.`;
+        } else {
+            msgUi.innerHTML = `슬롯이 가득 찼습니다.&lt;br&gt;새로운 &lt;b&gt;&lt;span style=&quot;color:#fca311;&quot;&gt;${pendingSkill.id}&lt;/span&gt;&lt;/b&gt; 스킬을 배우려면 기존 스킬을 잊어야 합니다.`;
+        }
+
+        inventory.forEach((item, index) =&gt; {
+            let card = document.createElement(&#x27;div&#x27;);
+            
+            // forceCategory가 설정되어 있는데 해당 아이템의 카테고리가 다르면 교체 불가(disabled) 처리
+            let isDisabled = forceCategory &amp;&amp; item.category !== forceCategory;
+            card.className = `item-card replace-item ${isDisabled ? &#x27;disabled&#x27; : &#x27;&#x27;}`;
+            
+            if (isDisabled) {
+                card.innerHTML = `
+                    &lt;div class=&quot;item-id cat-${item.category}&quot;&gt;${item.id}&lt;/div&gt;
+                    &lt;div class=&quot;item-level&quot;&gt;Lv.${item.level}&lt;/div&gt;
+                    &lt;div style=&quot;font-size:0.8em; margin-top:5px; color:#aaa;&quot;&gt;[교체 불가]&lt;/div&gt;
+                `;
+            } else {
+                card.innerHTML = `
+                    &lt;div class=&quot;item-id cat-${item.category}&quot;&gt;${item.id}&lt;/div&gt;
+                    &lt;div class=&quot;item-level&quot;&gt;Lv.${item.level}&lt;/div&gt;
+                    &lt;div style=&quot;font-size:0.8em; margin-top:5px;&quot;&gt;[버리기]&lt;/div&gt;
+                `;
+                card.onclick = () =&gt; executeReplace(index);
+            }
+            listUi.appendChild(card);
+        });
+
+        modal.style.display = &#x27;flex&#x27;;
+    }
+
+    function executeReplace(index) {
+        let removed = inventory.splice(index, 1)[0];
+        inventory.push(pendingSkill);
+        log(`🔄 스킬 교체: [${removed.id}] 삭제됨 -&gt; [${pendingSkill.id}] 신규 획득!`);
+        pendingSkill = null;
+        document.getElementById(&#x27;replace-modal&#x27;).style.display = &#x27;none&#x27;;
+        document.getElementById(&#x27;choices-ui&#x27;).innerHTML = &#x27;&#x27;;
+        updateUI();
+    }
+
+    function cancelReplace() {
+        pendingSkill = null;
+        document.getElementById(&#x27;replace-modal&#x27;).style.display = &#x27;none&#x27;;
+        log(`❌ 스킬 교체 취소 (기존 유지)`);
+    }
+
+    function updateUI() {
+        document.getElementById(&#x27;inv-count&#x27;).innerText = inventory.length;
+        const invUi = document.getElementById(&#x27;inventory-ui&#x27;);
+        invUi.innerHTML = &#x27;&#x27;;
+
+        inventory.forEach(item =&gt; {
+            invUi.innerHTML += `
+                &lt;div class=&quot;item-card&quot;&gt;
+                    &lt;div class=&quot;item-id cat-${item.category}&quot;&gt;${item.id}&lt;/div&gt;
+                    &lt;div class=&quot;item-level&quot;&gt;Lv.${item.level} / ${MAX_LEVEL}&lt;/div&gt;
+                &lt;/div&gt;
+            `;
+        });
+
+        for (let i = inventory.length; i &lt; MAX_INVENTORY; i++) {
+            invUi.innerHTML += `
+                &lt;div class=&quot;item-card empty&quot;&gt;
+                    &lt;div&gt;빈 슬롯&lt;/div&gt;
+                &lt;/div&gt;
+            `;
+        }
+    }
+
+    updateUI();
+&lt;/script&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;"></iframe>
+</main>
+<script>
+const tabs = document.querySelectorAll('.tab');
+const panels = document.querySelectorAll('.panel');
+tabs.forEach(tab => {
+  tab.addEventListener('click', () => {
+    tabs.forEach(t => t.classList.remove('active'));
+    panels.forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById(tab.dataset.target).classList.add('active');
+  });
+});
+</script>
+</body>
+</html>
